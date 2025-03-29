@@ -62,6 +62,31 @@
         .button.meditating {
             background-color: #45a049;
         }
+
+        .sync-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .sync-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .sync-button:hover {
+            background-color: #1976D2;
+        }
+
+        #importInput {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -78,6 +103,11 @@
         >
             Hold to Meditate
         </button>
+        <div class="sync-buttons">
+            <button class="sync-button" onclick="exportData()">Export Data</button>
+            <button class="sync-button" onclick="document.getElementById('importInput').click()">Import Data</button>
+            <input type="file" id="importInput" accept=".json" onchange="importData(event)">
+        </div>
     </div>
 
     <script>
@@ -149,6 +179,54 @@
 
         function updateCurrentTimeDisplay() {
             document.getElementById('currentTime').textContent = formatTime(currentSessionTime);
+        }
+
+        function exportData() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('meditation_')) {
+                    data[key] = localStorage.getItem(key);
+                }
+            }
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'meditation-data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    for (const [key, value] of Object.entries(data)) {
+                        if (key.startsWith('meditation_')) {
+                            localStorage.setItem(key, value);
+                        }
+                    }
+                    // Reload the current day's data
+                    const today = new Date().toISOString().split('T')[0];
+                    const savedTime = localStorage.getItem(`meditation_${today}`);
+                    if (savedTime) {
+                        totalTime = parseFloat(savedTime);
+                        updateTotalTimeDisplay();
+                    }
+                    alert('Data imported successfully!');
+                } catch (error) {
+                    alert('Error importing data. Please make sure the file is valid.');
+                }
+            };
+            reader.readAsText(file);
         }
     </script>
 </body>
