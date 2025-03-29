@@ -19,7 +19,7 @@ A simple, elegant meditation timer that helps you track your daily meditation pr
 
 ## Try It Out
 
-Visit [Meditation Timer](https://shawnhua2489.github.io/Meditation-Timer/meditation-timer.html) to start meditating!
+Visit [Meditation Timer](https://shawnhua2489.github.io/Meditation-Timer/) to start meditating!
 
 ## Technical Details
 
