@@ -466,21 +466,15 @@
             }
             
             console.log('Creating new scanner...');
-            // Initialize scanner with optimized settings for better detection
+            // Initialize scanner with simplified options for Safari
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader", 
                 { 
-                    fps: 30,  // Increased frame rate for better detection
+                    fps: 10,
                     qrbox: {width: 250, height: 250},
                     aspectRatio: 1.0,
                     videoConstraints: {
-                        facingMode: { ideal: "environment" },
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    // Add experimental options for better detection
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
+                        facingMode: { ideal: "environment" }
                     }
                 }
             );
@@ -493,23 +487,23 @@
                     console.log('QR Code scanned successfully:', decodedText);
                     importFromCode(decodedText);
                 }, (errorMessage) => {
-                    // Error callback - only show error for actual errors, not for normal scanning attempts
-                    if (!errorMessage.includes('QR code parse error')) {
-                        console.error('QR Code scanning error:', errorMessage);
-                        if (errorMessage.includes('Permission denied')) {
-                            if (isIOSSafari) {
-                                alert('To enable camera access in Safari:\n\n1. Go to iOS Settings\n2. Scroll down to Safari\n3. Tap "Settings for Websites"\n4. Tap "Camera"\n5. Find this website and set it to "Allow"\n\nOr use the manual input option below.');
-                            } else {
-                                alert('Please allow camera access in your browser settings to scan QR codes.');
-                            }
+                    // Error callback
+                    console.error('QR Code scanning error:', errorMessage);
+                    if (errorMessage.includes('Permission denied')) {
+                        if (isIOSSafari) {
+                            alert('To use the camera in Safari:\n\n1. Tap the "aA" button in the address bar\n2. Tap "Website Settings"\n3. Find "Camera" and set it to "Allow"\n4. Refresh the page\n\nOr use the manual input option below.');
+                        } else {
+                            alert('Please allow camera access in your browser settings to scan QR codes.');
                         }
+                    } else if (isIOSSafari) {
+                        alert('If the camera view is blank:\n\n1. Tap the "aA" button in the address bar\n2. Tap "Website Settings"\n3. Find "Camera" and set it to "Allow"\n4. Refresh the page\n\nOr use the manual input option below.');
                     }
                 });
                 console.log('Scanner render completed successfully');
             } catch (error) {
                 console.error('Scanner initialization error:', error);
                 if (isIOSSafari) {
-                    alert('To enable camera access in Safari:\n\n1. Go to iOS Settings\n2. Scroll down to Safari\n3. Tap "Settings for Websites"\n4. Tap "Camera"\n5. Find this website and set it to "Allow"\n\nOr use the manual input option below.');
+                    alert('To use the camera in Safari:\n\n1. Tap the "aA" button in the address bar\n2. Tap "Website Settings"\n3. Find "Camera" and set it to "Allow"\n4. Refresh the page\n\nOr use the manual input option below.');
                 } else {
                     alert('Failed to initialize camera. Please make sure you have granted camera permissions and try again.');
                 }
@@ -567,6 +561,43 @@
             }
             if (event.target == importModal) {
                 closeImportModal();
+            }
+        }
+
+        // Add vibration feedback function
+        function vibrate(duration) {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(duration);
+            }
+        }
+
+        // Update the hold to meditate button event listeners
+        document.getElementById('holdToMeditate').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            if (!isMeditating) {
+                vibrate(50); // Short vibration when starting
+                startMeditation();
+            }
+        });
+
+        document.getElementById('holdToMeditate').addEventListener('touchend', function(e) {
+            e.preventDefault();
+            if (isMeditating) {
+                vibrate([50, 30, 50]); // Pattern vibration when stopping
+                stopMeditation();
+            }
+        });
+
+        // Update the stopMeditation function to include vibration
+        function stopMeditation() {
+            if (isMeditating) {
+                isMeditating = false;
+                vibrate([50, 30, 50]); // Pattern vibration when stopping
+                document.getElementById('holdToMeditate').style.backgroundColor = '#4CAF50';
+                document.getElementById('holdToMeditate').textContent = 'Hold to Meditate';
+                clearInterval(timerInterval);
+                updateCurrentTimeDisplay();
+                saveTodayTime();
             }
         }
     </script>
