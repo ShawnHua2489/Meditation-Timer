@@ -102,12 +102,16 @@
         .modal-content {
             position: relative;
             background-color: white;
-            margin: 15% auto;
+            margin: 5% auto;
             padding: 20px;
             width: 80%;
             max-width: 500px;
             border-radius: 10px;
             text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
         }
 
         .close {
@@ -141,6 +145,8 @@
             background-color: white;
             border-radius: 5px;
             display: inline-block;
+            position: relative;
+            z-index: 1;
         }
 
         .share-options {
