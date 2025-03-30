@@ -234,9 +234,6 @@
         <button 
             class="button" 
             id="meditationButton"
-            onpointerdown="startMeditation()"
-            onpointerup="stopMeditation()"
-            onpointerleave="stopMeditation()"
         >
             Hold to Meditate
         </button>
@@ -574,34 +571,66 @@
             }
         }
 
-        // Update the vibration function to be more reliable
+        // Update the vibration function to support both standard vibration and iOS haptic feedback
         function vibrate(duration) {
-            if ('vibrate' in navigator) {
-                // Ensure duration is a number
-                const vibrateDuration = Array.isArray(duration) ? duration : [duration];
-                try {
-                    navigator.vibrate(vibrateDuration);
-                } catch (e) {
-                    console.log('Vibration not supported or failed:', e);
+            // Check if we're on iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            
+            if (isIOS) {
+                // Try iOS haptic feedback
+                if (window.navigator.vibrate) {
+                    window.navigator.vibrate(duration);
+                } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.haptic) {
+                    // iOS haptic feedback
+                    window.webkit.messageHandlers.haptic.postMessage({
+                        type: 'impact',
+                        style: 'medium'
+                    });
+                }
+            } else {
+                // Standard vibration for other devices
+                if ('vibrate' in navigator) {
+                    const vibrateDuration = Array.isArray(duration) ? duration : [duration];
+                    try {
+                        navigator.vibrate(vibrateDuration);
+                    } catch (e) {
+                        console.log('Vibration not supported or failed:', e);
+                    }
                 }
             }
         }
 
-        // Update the button event handlers to prevent default behavior
-        document.getElementById('meditationButton').addEventListener('touchstart', function(e) {
+        // Update the button event handlers to use more reliable touch events
+        const meditationButton = document.getElementById('meditationButton');
+        
+        meditationButton.addEventListener('touchstart', function(e) {
             e.preventDefault();
-            startMeditation();
+            if (!isMeditating) {
+                vibrate(50);
+                startMeditation();
+            }
         }, { passive: false });
 
-        document.getElementById('meditationButton').addEventListener('touchend', function(e) {
+        meditationButton.addEventListener('touchend', function(e) {
             e.preventDefault();
-            stopMeditation();
+            if (isMeditating) {
+                vibrate([50, 30, 50]);
+                stopMeditation();
+            }
         }, { passive: false });
 
-        document.getElementById('meditationButton').addEventListener('touchcancel', function(e) {
+        meditationButton.addEventListener('touchcancel', function(e) {
             e.preventDefault();
-            stopMeditation();
+            if (isMeditating) {
+                vibrate([50, 30, 50]);
+                stopMeditation();
+            }
         }, { passive: false });
+
+        // Remove the onpointer events from the button HTML
+        meditationButton.removeAttribute('onpointerdown');
+        meditationButton.removeAttribute('onpointerup');
+        meditationButton.removeAttribute('onpointerleave');
     </script>
 </body>
 </html> 
