@@ -310,8 +310,15 @@
             const qrcodeElement = document.getElementById('qrcode');
             qrcodeElement.innerHTML = '';
             
-            // Generate new QR code
-            QRCode.toCanvas(qrcodeElement, code, function (error) {
+            // Generate new QR code with proper options
+            QRCode.toCanvas(qrcodeElement, code, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            }, function (error) {
                 if (error) console.error(error);
             });
             
