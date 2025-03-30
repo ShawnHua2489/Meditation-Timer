@@ -55,6 +55,12 @@
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none;   /* Safari */
+            -khtml-user-select: none;    /* Konqueror HTML */
+            -moz-user-select: none;      /* Firefox */
+            -ms-user-select: none;       /* Internet Explorer/Edge */
+            user-select: none;           /* Non-prefixed version */
         }
 
         .button:active {
@@ -568,12 +574,34 @@
             }
         }
 
-        // Add vibration feedback function
+        // Update the vibration function to be more reliable
         function vibrate(duration) {
             if ('vibrate' in navigator) {
-                navigator.vibrate(duration);
+                // Ensure duration is a number
+                const vibrateDuration = Array.isArray(duration) ? duration : [duration];
+                try {
+                    navigator.vibrate(vibrateDuration);
+                } catch (e) {
+                    console.log('Vibration not supported or failed:', e);
+                }
             }
         }
+
+        // Update the button event handlers to prevent default behavior
+        document.getElementById('meditationButton').addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            startMeditation();
+        }, { passive: false });
+
+        document.getElementById('meditationButton').addEventListener('touchend', function(e) {
+            e.preventDefault();
+            stopMeditation();
+        }, { passive: false });
+
+        document.getElementById('meditationButton').addEventListener('touchcancel', function(e) {
+            e.preventDefault();
+            stopMeditation();
+        }, { passive: false });
     </script>
 </body>
 </html> 
