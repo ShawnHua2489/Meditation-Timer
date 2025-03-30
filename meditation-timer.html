@@ -410,6 +410,14 @@
         // Import functionality
         function showImportModal() {
             document.getElementById('importModal').style.display = 'block';
+            // Show a warning if not in secure context
+            if (!window.isSecureContext) {
+                const warning = document.createElement('div');
+                warning.style.color = '#ff6b6b';
+                warning.style.margin = '10px 0';
+                warning.innerHTML = '⚠️ Note: Camera scanning requires a secure connection. Please use the GitHub Pages version for full functionality.';
+                document.querySelector('.modal-content').insertBefore(warning, document.querySelector('.share-options'));
+            }
         }
 
         function closeImportModal() {
@@ -422,6 +430,13 @@
         }
 
         function startScanner() {
+            // Check if we're in a secure context (HTTPS or localhost)
+            const isSecureContext = window.isSecureContext;
+            if (!isSecureContext) {
+                alert('Camera access requires a secure connection. Please use the GitHub Pages version of the app: https://shawnhua2489.github.io/Meditation-Timer/meditation-timer.html');
+                return;
+            }
+
             // Hide manual input and show scanner
             document.getElementById('manualInputContainer').style.display = 'none';
             document.getElementById('scannerContainer').style.display = 'block';
