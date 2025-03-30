@@ -441,13 +441,17 @@
             document.getElementById('manualInputContainer').style.display = 'none';
             document.getElementById('scannerContainer').style.display = 'block';
             
-            // Initialize scanner
+            // Initialize scanner with back camera preference
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader", 
                 { 
                     fps: 10,
                     qrbox: {width: 250, height: 250},
-                    aspectRatio: 1.0
+                    aspectRatio: 1.0,
+                    // Add camera selection options
+                    videoConstraints: {
+                        facingMode: { ideal: "environment" } // Prefer back camera
+                    }
                 }
             );
             
