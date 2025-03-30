@@ -55,25 +55,11 @@
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
-            user-select: none; /* Prevent text selection */
-            -webkit-user-select: none; /* For Safari */
-            touch-action: manipulation; /* Optimize touch actions */
         }
 
-        /* Add touch feedback styles */
-        @media (hover: none) {
-            .button:active {
-                transform: scale(0.95);
-                background-color: #45a049;
-            }
-        }
-
-        /* Prevent text selection on all interactive elements */
-        button, .sync-button, .share-option {
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
+        .button:active {
+            transform: scale(0.95);
+            background-color: #45a049;
         }
 
         .button.meditating {
@@ -205,37 +191,32 @@
             background: white;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         #reader__scan_region img {
             display: none;
         }
 
-        /* Hide unnecessary elements */
         #reader__dashboard {
-            display: none !important;
-        }
-
-        #reader__scan_region select {
-            display: none !important;
-        }
-
-        #reader__scan_region button {
-            display: none !important;
-        }
-
-        /* Style the video element */
-        #reader__scan_region video {
-            border-radius: 10px;
-            width: 100% !important;
-            height: auto !important;
-        }
-
-        /* Add a nice border to the scanning area */
-        #reader__scan_region {
-            border: 2px solid #2196F3;
             padding: 10px;
+            background: white;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        #reader__dashboard button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        #reader__dashboard button:hover {
+            background-color: #1976D2;
         }
     </style>
 </head>
@@ -446,17 +427,23 @@
         }
 
         function closeImportModal() {
+            console.log('Closing import modal...');
             document.getElementById('importModal').style.display = 'none';
             // Clean up scanner if it exists
             if (html5QrcodeScanner) {
+                console.log('Cleaning up scanner...');
                 html5QrcodeScanner.clear();
                 html5QrcodeScanner = null;
             }
         }
 
         function startScanner() {
+            console.log('Starting scanner initialization...');
+            
             // Check if we're in a secure context (HTTPS or localhost)
             const isSecureContext = window.isSecureContext;
+            console.log('Secure context:', isSecureContext);
+            
             if (!isSecureContext) {
                 alert('Camera access requires a secure connection. Please use the GitHub Pages version of the app: https://shawnhua2489.github.io/Meditation-Timer/meditation-timer.html');
                 return;
@@ -466,28 +453,45 @@
             document.getElementById('manualInputContainer').style.display = 'none';
             document.getElementById('scannerContainer').style.display = 'block';
             
-            // Initialize scanner with back camera preference
+            // Check if scanner already exists
+            if (html5QrcodeScanner) {
+                console.log('Clearing existing scanner...');
+                html5QrcodeScanner.clear();
+            }
+            
+            console.log('Creating new scanner...');
+            // Initialize scanner with simplified options
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader", 
                 { 
                     fps: 10,
                     qrbox: {width: 250, height: 250},
                     aspectRatio: 1.0,
-                    // Add camera selection options
                     videoConstraints: {
-                        facingMode: { ideal: "environment" } // Prefer back camera
+                        facingMode: { ideal: "environment" }
                     }
                 }
             );
             
-            html5QrcodeScanner.render((decodedText) => {
-                // Success callback
-                console.log('QR Code scanned:', decodedText);
-                importFromCode(decodedText);
-            }, (errorMessage) => {
-                // Error callback
-                console.log('QR Code scanning error:', errorMessage);
-            });
+            console.log('Starting scanner render...');
+            // Add error handling for camera access
+            try {
+                html5QrcodeScanner.render((decodedText) => {
+                    // Success callback
+                    console.log('QR Code scanned successfully:', decodedText);
+                    importFromCode(decodedText);
+                }, (errorMessage) => {
+                    // Error callback
+                    console.error('QR Code scanning error:', errorMessage);
+                    if (errorMessage.includes('Permission denied')) {
+                        alert('Please allow camera access in your browser settings to scan QR codes.');
+                    }
+                });
+                console.log('Scanner render completed successfully');
+            } catch (error) {
+                console.error('Scanner initialization error:', error);
+                alert('Failed to initialize camera. Please make sure you have granted camera permissions and try again.');
+            }
         }
 
         function showManualInput() {
