@@ -295,6 +295,7 @@
 
         // Share functionality
         function showShareModal() {
+            console.log('Opening share modal...');
             const data = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
@@ -305,24 +306,33 @@
             
             // Create a shareable code
             const code = btoa(JSON.stringify(data));
+            console.log('Generated code:', code);
             
             // Clear previous QR code
             const qrcodeElement = document.getElementById('qrcode');
             qrcodeElement.innerHTML = '';
             
             // Generate new QR code with proper options
-            QRCode.toCanvas(qrcodeElement, code, {
+            QRCode.toDataURL(code, {
                 width: 200,
                 margin: 2,
                 color: {
                     dark: '#000000',
                     light: '#ffffff'
                 }
-            }, function (error) {
-                if (error) console.error(error);
+            }, function (error, url) {
+                if (error) {
+                    console.error('QR Code generation error:', error);
+                    return;
+                }
+                console.log('QR Code generated successfully');
+                const img = document.createElement('img');
+                img.src = url;
+                qrcodeElement.appendChild(img);
             });
             
             document.getElementById('shareModal').style.display = 'block';
+            console.log('Share modal displayed');
         }
 
         function closeShareModal() {
