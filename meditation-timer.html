@@ -444,9 +444,11 @@
             const isSecureContext = window.isSecureContext;
             console.log('Secure context:', isSecureContext);
             
-            // Detect iOS device
+            // Detect iOS Safari
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            console.log('Is iOS device:', isIOS);
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const isIOSSafari = isIOS && isSafari;
+            console.log('Is iOS Safari:', isIOSSafari);
             
             if (!isSecureContext) {
                 alert('Camera access requires a secure connection. Please use the GitHub Pages version of the app: https://shawnhua2489.github.io/Meditation-Timer/meditation-timer.html');
@@ -464,7 +466,7 @@
             }
             
             console.log('Creating new scanner...');
-            // Initialize scanner with iOS-specific options
+            // Initialize scanner with simplified options for Safari
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader", 
                 { 
@@ -472,17 +474,7 @@
                     qrbox: {width: 250, height: 250},
                     aspectRatio: 1.0,
                     videoConstraints: {
-                        facingMode: { ideal: "environment" },
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    // Add iOS specific options
-                    rememberLastUsedCamera: true,
-                    showTorchButtonIfSupported: true,
-                    showZoomSliderIfSupported: true,
-                    // Add experimental options for iOS
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
+                        facingMode: { ideal: "environment" }
                     }
                 }
             );
@@ -498,15 +490,23 @@
                     // Error callback
                     console.error('QR Code scanning error:', errorMessage);
                     if (errorMessage.includes('Permission denied')) {
-                        alert('Please allow camera access in your browser settings to scan QR codes.');
-                    } else if (isIOS) {
-                        alert('If the camera view is blank, please try:\n1. Closing and reopening the browser\n2. Using Safari instead of other browsers\n3. Using the manual input option');
+                        if (isIOSSafari) {
+                            alert('To use the camera in Safari:\n\n1. Tap the "aA" button in the address bar\n2. Tap "Website Settings"\n3. Find "Camera" and set it to "Allow"\n4. Refresh the page\n\nOr use the manual input option below.');
+                        } else {
+                            alert('Please allow camera access in your browser settings to scan QR codes.');
+                        }
+                    } else if (isIOSSafari) {
+                        alert('If the camera view is blank:\n\n1. Tap the "aA" button in the address bar\n2. Tap "Website Settings"\n3. Find "Camera" and set it to "Allow"\n4. Refresh the page\n\nOr use the manual input option below.');
                     }
                 });
                 console.log('Scanner render completed successfully');
             } catch (error) {
                 console.error('Scanner initialization error:', error);
-                alert('Failed to initialize camera. Please make sure you have granted camera permissions and try again.');
+                if (isIOSSafari) {
+                    alert('To use the camera in Safari:\n\n1. Tap the "aA" button in the address bar\n2. Tap "Website Settings"\n3. Find "Camera" and set it to "Allow"\n4. Refresh the page\n\nOr use the manual input option below.');
+                } else {
+                    alert('Failed to initialize camera. Please make sure you have granted camera permissions and try again.');
+                }
             }
         }
 
