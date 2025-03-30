@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meditation Timer</title>
     <!-- Add QR Code library -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -312,23 +312,14 @@
             const qrcodeElement = document.getElementById('qrcode');
             qrcodeElement.innerHTML = '';
             
-            // Generate new QR code with proper options
-            QRCode.toDataURL(code, {
+            // Generate new QR code
+            new QRCode(qrcodeElement, {
+                text: code,
                 width: 200,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#ffffff'
-                }
-            }, function (error, url) {
-                if (error) {
-                    console.error('QR Code generation error:', error);
-                    return;
-                }
-                console.log('QR Code generated successfully');
-                const img = document.createElement('img');
-                img.src = url;
-                qrcodeElement.appendChild(img);
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
             
             document.getElementById('shareModal').style.display = 'block';
