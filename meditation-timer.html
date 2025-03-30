@@ -55,11 +55,25 @@
             cursor: pointer;
             transition: transform 0.2s, background-color 0.2s;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+            user-select: none; /* Prevent text selection */
+            -webkit-user-select: none; /* For Safari */
+            touch-action: manipulation; /* Optimize touch actions */
         }
 
-        .button:active {
-            transform: scale(0.95);
-            background-color: #45a049;
+        /* Add touch feedback styles */
+        @media (hover: none) {
+            .button:active {
+                transform: scale(0.95);
+                background-color: #45a049;
+            }
+        }
+
+        /* Prevent text selection on all interactive elements */
+        button, .sync-button, .share-option {
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .button.meditating {
