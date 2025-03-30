@@ -205,32 +205,37 @@
             background: white;
             border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         #reader__scan_region img {
             display: none;
         }
 
+        /* Hide unnecessary elements */
         #reader__dashboard {
-            padding: 10px;
-            background: white;
+            display: none !important;
+        }
+
+        #reader__scan_region select {
+            display: none !important;
+        }
+
+        #reader__scan_region button {
+            display: none !important;
+        }
+
+        /* Style the video element */
+        #reader__scan_region video {
             border-radius: 10px;
-            margin-top: 10px;
+            width: 100% !important;
+            height: auto !important;
         }
 
-        #reader__dashboard button {
-            background-color: #2196F3;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            margin: 5px;
-        }
-
-        #reader__dashboard button:hover {
-            background-color: #1976D2;
+        /* Add a nice border to the scanning area */
+        #reader__scan_region {
+            border: 2px solid #2196F3;
+            padding: 10px;
         }
     </style>
 </head>
