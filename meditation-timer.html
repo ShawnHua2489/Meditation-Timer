@@ -310,6 +310,7 @@
             if (!isMeditating) {
                 isMeditating = true;
                 lastUpdate = Date.now();
+                vibrate(50); // Short vibration when starting
                 document.getElementById('meditationButton').classList.add('meditating');
                 document.getElementById('meditationButton').textContent = 'Release to Stop';
                 
@@ -326,13 +327,16 @@
         function stopMeditation() {
             if (isMeditating) {
                 isMeditating = false;
-                clearInterval(timerInterval);
+                vibrate([50, 30, 50]); // Pattern vibration when stopping
                 document.getElementById('meditationButton').classList.remove('meditating');
                 document.getElementById('meditationButton').textContent = 'Hold to Meditate';
+                clearInterval(timerInterval);
                 
                 if (currentSessionTime > 0) {
                     saveTodayTime();
                 }
+                currentSessionTime = 0;
+                updateCurrentTimeDisplay();
             }
         }
 
@@ -568,36 +572,6 @@
         function vibrate(duration) {
             if ('vibrate' in navigator) {
                 navigator.vibrate(duration);
-            }
-        }
-
-        // Update the hold to meditate button event listeners
-        document.getElementById('holdToMeditate').addEventListener('touchstart', function(e) {
-            e.preventDefault();
-            if (!isMeditating) {
-                vibrate(50); // Short vibration when starting
-                startMeditation();
-            }
-        });
-
-        document.getElementById('holdToMeditate').addEventListener('touchend', function(e) {
-            e.preventDefault();
-            if (isMeditating) {
-                vibrate([50, 30, 50]); // Pattern vibration when stopping
-                stopMeditation();
-            }
-        });
-
-        // Update the stopMeditation function to include vibration
-        function stopMeditation() {
-            if (isMeditating) {
-                isMeditating = false;
-                vibrate([50, 30, 50]); // Pattern vibration when stopping
-                document.getElementById('holdToMeditate').style.backgroundColor = '#4CAF50';
-                document.getElementById('holdToMeditate').textContent = 'Hold to Meditate';
-                clearInterval(timerInterval);
-                updateCurrentTimeDisplay();
-                saveTodayTime();
             }
         }
     </script>
