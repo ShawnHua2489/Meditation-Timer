@@ -444,6 +444,10 @@
             const isSecureContext = window.isSecureContext;
             console.log('Secure context:', isSecureContext);
             
+            // Detect iOS device
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            console.log('Is iOS device:', isIOS);
+            
             if (!isSecureContext) {
                 alert('Camera access requires a secure connection. Please use the GitHub Pages version of the app: https://shawnhua2489.github.io/Meditation-Timer/meditation-timer.html');
                 return;
@@ -460,7 +464,7 @@
             }
             
             console.log('Creating new scanner...');
-            // Initialize scanner with simplified options
+            // Initialize scanner with iOS-specific options
             html5QrcodeScanner = new Html5QrcodeScanner(
                 "reader", 
                 { 
@@ -468,7 +472,17 @@
                     qrbox: {width: 250, height: 250},
                     aspectRatio: 1.0,
                     videoConstraints: {
-                        facingMode: { ideal: "environment" }
+                        facingMode: { ideal: "environment" },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    // Add iOS specific options
+                    rememberLastUsedCamera: true,
+                    showTorchButtonIfSupported: true,
+                    showZoomSliderIfSupported: true,
+                    // Add experimental options for iOS
+                    experimentalFeatures: {
+                        useBarCodeDetectorIfSupported: true
                     }
                 }
             );
@@ -485,6 +499,8 @@
                     console.error('QR Code scanning error:', errorMessage);
                     if (errorMessage.includes('Permission denied')) {
                         alert('Please allow camera access in your browser settings to scan QR codes.');
+                    } else if (isIOS) {
+                        alert('If the camera view is blank, please try:\n1. Closing and reopening the browser\n2. Using Safari instead of other browsers\n3. Using the manual input option');
                     }
                 });
                 console.log('Scanner render completed successfully');
